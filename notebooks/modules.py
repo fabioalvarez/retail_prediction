@@ -1,4 +1,5 @@
 from pathlib import Path
+import shutil
 import pandas as pd
 import cv2
 import os
@@ -145,3 +146,23 @@ def plot_bounding_boxes(images_dir:str, df:pd.DataFrame, column:str, final_image
         count += 1
         if count == 10:
             break
+
+
+def mov_images(images_dir: str, split_dir:str, images_list:list):
+
+    # Create paths
+    for image_name in images_list:
+        # Get the key path of the image (train/test/val)
+        print(image_name)
+        key_path = image_name.split('_')[0]
+
+        # Creat full path to save the image
+        src_path = os.path.join(images_dir, image_name)
+        key_dir = os.path.join(split_dir, key_path)
+        dst_dir = os.path.join(key_dir, image_name)
+
+        if not os.path.exists(key_dir):
+            os.mkdir(key_dir)
+        
+        if not os.path.exists(dst_dir):
+            shutil.move(src_path, dst_dir)
