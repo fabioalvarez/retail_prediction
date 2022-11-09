@@ -19,7 +19,6 @@ LOCATION_DIR= os.getenv('LOCATION_DIR')
 
 # Initiate paths env variables
 
-
 # Get folders and files names from bucket
 def get_file_folders(
     s3_client,
@@ -49,7 +48,7 @@ def get_file_folders(
     """
 
     # Initiate variables
-    folders, files = list(), list()
+    folders, files = [], []
     # Define 
     default_kwargs = {
         "Bucket": bucket,
@@ -70,14 +69,14 @@ def get_file_folders(
     return folders, files
 
 def run():
-    s3_client = boto3.client("s3",
-                      aws_access_key_id=ACCESS_KEY,
-                      aws_secret_access_key=SECRET_KEY
-    )
+    try:
+        s3_client = boto3.client("s3", aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY)
+        print("Connected succesfully")
 
-    folders, files = get_file_folders(s3_client=s3_client, bucket=BUCKET_NAME, prefix=BUCKET_PREFIX)
-    print(files[0])
-
+        folders, files = get_file_folders(s3_client=s3_client, bucket=BUCKET_NAME, prefix=BUCKET_PREFIX)
+        
+    except:
+        raise ValueError("Cannot conect with AWS")
 
 def main_prepare_datasets():
     run()

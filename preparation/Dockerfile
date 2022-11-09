@@ -1,11 +1,11 @@
 FROM python:3.9 as base
 
-WORKDIR  /src
+WORKDIR  /home
 
 RUN pip3 install --upgrade pip
 
-COPY ./requirements.txt /src/requirements.txt
+COPY ./requirements.txt /home/requirements.txt
 
-RUN pip install --no-cache-dir --upgrade -r /src/requirements.txt
+RUN pip install --no-cache-dir --upgrade -r /home/requirements.txt
 
-COPY . /src/preparation/
+COPY . /home/app/src
