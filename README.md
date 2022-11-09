@@ -2,6 +2,22 @@
 Predict empty spaces in supermarkets
 
 
+
+# preparation
+
+```
+docker build -t preparation .
+```
+
+```
+docker run --rm --net host -it\
+    -v $(pwd):/home/app/src \
+    --workdir /home/app/src \
+    preparation \
+    bash
+```
+
+
 # api
 ```
 .
