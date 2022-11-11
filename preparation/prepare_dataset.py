@@ -260,46 +260,24 @@ def plot_bounding_boxes(
 
 def run():
     try:
-        s3_client = boto3.client("s3",
-                                aws_access_key_id=ACCESS_KEY,
-                                aws_secret_access_key=SECRET_KEY
-        )
+        s3_client = boto3.client("s3", aws_access_key_id=ACCESS_KEY,aws_secret_access_key=SECRET_KEY)
     except:
         raise ValueError("Cannot conect with AWS")
-
     print("Connected succesfully")
-    folders, files = get_file_folders(s3_client=s3_client,
-                                        bucket=BUCKET_NAME, 
-                                        prefix=BUCKET_PREFIX
-    )
-    
+
+    folders, files = get_file_folders(s3_client=s3_client,bucket=BUCKET_NAME, prefix=BUCKET_PREFIX)
     print("Got folder and file list in bucket")
-    download = download_files(s3_client=s3_client,
-                        bucket_name=BUCKET_NAME,
-                        prefix=BUCKET_PREFIX,
-                        folders=folders,
-                        file_names=files,
-                        path_to_save=path_to_save
-    )
-        
+
+    download = download_files(s3_client=s3_client,bucket_name=BUCKET_NAME,prefix=BUCKET_PREFIX,folders=folders,file_names=files,path_to_save=path_to_save)
     print("Files downloaded")
-    df = concatenate_csv(txt_file,
-     test_file,
-     train_file,
-     val_file)
 
+    df = concatenate_csv(txt_file, test_file, train_file,val_file)
     print("CSV concatenated")
-    plot_bounding_boxes(final_images_dir=final_images_dir,
-                    images_dir=images_dir,
-                    df=df,
-                    column="image_name",
-                    quantity=10)
 
+    plot_bounding_boxes(final_images_dir=final_images_dir,images_dir=images_dir, df=df, column="image_name", quantity=10)
     print(f"Just plotted your images")
-    mov_img = mov_images(images_dir,
-                        split_dir)
 
-    
+    mov_img = mov_images(images_dir,split_dir)
     print(f"Folder structure for yolo images created")
 
 def main_prepare_datasets():
