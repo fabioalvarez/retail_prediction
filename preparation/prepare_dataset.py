@@ -4,7 +4,7 @@ from PIL import Image
 import pandas as pd
 import shutil
 import boto3
-# import cv2
+import cv2
 import os
 load_dotenv()
 
@@ -20,7 +20,7 @@ PATH_TO_SAVE = os.getenv('PATH_TO_SAVE')
 path_to_save = os.path.join(BASE_DIR, PATH_TO_SAVE)
 
 # csv files directions
-csv_paths  = os.getenv('csv_paths') 
+csv_paths  = os.path.join(BASE_DIR, os.getenv('csv_paths'))
 txt_file   = os.path.join(csv_paths, os.getenv('txt_file'))
 test_file  = os.path.join(csv_paths, os.getenv('test_file')) 
 val_file   = os.path.join(csv_paths, os.getenv('val_file'))      
@@ -224,16 +224,21 @@ def plot_bounding_boxes(
     df:pd.DataFrame,
     images_dir:str,
     column:str,
+    quantity:int
 ):
 
     count = 0
     image_list = os.listdir(images_dir)
 
     for image_name in image_list:
-        print(image_name)
+        
         # Create paths
         image_path = os.path.join(images_dir, image_name)
         final_dir =  os.path.join(final_images_dir, image_name)
+
+        if not os.path.exists(final_images_dir):
+            os.makedirs(final_images_dir)
+            print(f"Bounding box path created")
 
         # Select boundind boxes for especified image
         bounding_list = df[df[column] == image_name]
@@ -249,21 +254,24 @@ def plot_bounding_boxes(
 
         cv2.imwrite(final_dir, image)
         count += 1
-        if count == 10:
+        if count == quantity:
             break
+
 
 def run():
     try:
         s3_client = boto3.client("s3",
-                                 aws_access_key_id=ACCESS_KEY,
-                                aws_secret_access_key=SECRET_KEY)
+                                aws_access_key_id=ACCESS_KEY,
+                                aws_secret_access_key=SECRET_KEY
+        )
     except:
         raise ValueError("Cannot conect with AWS")
 
     print("Connected succesfully")
     folders, files = get_file_folders(s3_client=s3_client,
                                         bucket=BUCKET_NAME, 
-                                        prefix=BUCKET_PREFIX)
+                                        prefix=BUCKET_PREFIX
+    )
     
     print("Got folder and file list in bucket")
     download = download_files(s3_client=s3_client,
@@ -273,12 +281,26 @@ def run():
                         file_names=files,
                         path_to_save=path_to_save
     )
-    
+        
     print("Files downloaded")
+    df = concatenate_csv(txt_file,
+     test_file,
+     train_file,
+     val_file)
+
+    print("CSV concatenated")
+    plot_bounding_boxes(final_images_dir=final_images_dir,
+                    images_dir=images_dir,
+                    df=df,
+                    column="image_name",
+                    quantity=10)
+
+    print(f"Just plotted your images")
     mov_img = mov_images(images_dir,
                         split_dir)
 
-    print("Files splitted and organized with Yolo format")
+    
+    print(f"Folder structure for yolo images created")
 
 def main_prepare_datasets():
     run()

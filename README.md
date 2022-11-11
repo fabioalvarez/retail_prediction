@@ -35,3 +35,21 @@ docker run --rm --net host -it\
 ```
 docker build -t api_test .
 ```
+
+
+## Move images
+
+Yolo V5 expects a folder architecture to infer class and test/train/val datasets:
+
+```
+data
+├── penguins
+│   ├── images
+│   │   ├── train
+│   │   ├── validation
+│   │   ├── test
+│   ├── labels
+│   │   ├── train
+│   │   ├── validation
+│   │   ├── test
+```
