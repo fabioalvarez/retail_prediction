@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 from PIL import Image
 import pandas as pd
+import tarfile
 import shutil
 import boto3
 import cv2
@@ -30,8 +31,10 @@ train_file = os.path.join(csv_paths, os.getenv('train_file'))
 final_images_dir = os.path.join(BASE_DIR, os.getenv('final_images_dir'))
 images_dir = os.path.join(BASE_DIR, os.getenv('images_dir'))
 split_dir = os.path.join(BASE_DIR, os.getenv('split_dir'))
+zip_path = os.path.join(BASE_DIR, os.getenv('zip_path'))
 
-# Initiate paths env variables
+# Other variables
+download_s3 = False
 
 
 # Get folders and files names from bucket
@@ -128,6 +131,26 @@ def download_files(
             file_name,
             str(file_path)
         )
+
+# Unzip files
+def unzip_data(zip_path,
+               path_to_save,
+               zip_file
+):
+
+    if not os.path.exists(path_to_save):
+        os.makedirs(path_to_save)
+
+    # zip file path
+    zip_path = os.path.join(zip_path, zip_file)
+
+    # open file
+    file = tarfile.open(zip_path)
+
+    # extracting and closing file
+    file.extractall(path_to_save)
+    file.close()
+
 
 # Check corrupted files
 def check_bad_files(images_dir:str):
@@ -258,18 +281,23 @@ def plot_bounding_boxes(
             break
 
 
-def run():
-    try:
-        s3_client = boto3.client("s3", aws_access_key_id=ACCESS_KEY,aws_secret_access_key=SECRET_KEY)
-    except:
-        raise ValueError("Cannot conect with AWS")
-    print("Connected succesfully")
+def run(download_s3):
+    if download_s3:
+        try:
+            s3_client = boto3.client("s3", aws_access_key_id=ACCESS_KEY,aws_secret_access_key=SECRET_KEY)
+        except:
+            raise ValueError("Cannot conect with AWS")
+        print("Connected succesfully")
 
-    folders, files = get_file_folders(s3_client=s3_client,bucket=BUCKET_NAME, prefix=BUCKET_PREFIX)
-    print("Got folder and file list in bucket")
+        folders, files = get_file_folders(s3_client=s3_client,bucket=BUCKET_NAME, prefix=BUCKET_PREFIX)
+        print("Got folder and file list in bucket")
 
-    download = download_files(s3_client=s3_client,bucket_name=BUCKET_NAME,prefix=BUCKET_PREFIX,folders=folders,file_names=files,path_to_save=path_to_save)
-    print("Files downloaded")
+        download = download_files(s3_client=s3_client,bucket_name=BUCKET_NAME,prefix=BUCKET_PREFIX,folders=folders,file_names=files,path_to_save=path_to_save)
+        print("Files downloaded")
+    
+    else:
+        print("Unzipping files")
+        unzip_data(zip_path=zip_path, path_to_save=path_to_save, zip_file="SKU110K_fixed.tar.gz")
 
     df = concatenate_csv(txt_file, test_file, train_file,val_file)
     print("CSV concatenated")
@@ -281,7 +309,7 @@ def run():
     print(f"Folder structure for yolo images created")
 
 def main_prepare_datasets():
-    run()
+    run(download_s3)
 
 if __name__ == '__main__':
     main_prepare_datasets()
