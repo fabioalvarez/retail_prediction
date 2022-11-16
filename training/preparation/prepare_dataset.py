@@ -299,6 +299,11 @@ def run(download_s3):
         print("Unzipping files")
         unzip_data(zip_path=zip_path, path_to_save=path_to_save, zip_file="SKU110K_fixed.tar.gz")
 
+        # Rename folder
+        new_info_path = os.path.join(path_to_save, "SKU110K_fixed")
+        update_path = os.path.join(path_to_save, "raw")
+        os.rename(new_info_path, update_path)
+
     df = concatenate_csv(txt_file, test_file, train_file,val_file)
     print("CSV concatenated")
 
