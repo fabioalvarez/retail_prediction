@@ -1,2 +1,8 @@
 data
 training/yolov5
+training/preparation/__pycache__/prepare_dataset.cpython-38.pyc
+training/preparation/__pycache__/prepare_labels.cpython-38.pyc
+training/preparation/.env
+.gitignore
+README.md
+.gitignore

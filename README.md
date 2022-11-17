@@ -1,4 +1,13 @@
+# retail_prediction
+Predict empty spaces in supermarkets
+
 # Preparation
+
+## Download files from 
+
+```
+wget http://trax-geometry.s3.amazonaws.com/cvpr_challenge/SKU110K_fixed.tar.gz
+```
 
 ## Image and labels directories structure
 Yolo V5 expects a folder architecture to infer class and test/train/val datasets:
@@ -46,7 +55,6 @@ desired needs.
 yolov5
 ├── data
 │   ├── retail_data.yaml
-│   ├── test
 |   ├── hyps
 |   |   ├── hyp.scratch-low.yaml
 |   |   ├── hyp.scratch-med.yaml
@@ -59,25 +67,33 @@ yolov5
 │   └── lyolov5x.yaml
 ```
 
-
 ## Transfer Learning
 Models are composed of two main parts: the backbone layers which serves as a feature extractor, 
 and the head layers which computes the output predictions. To further compensate for a small
 dataset size, we’ll use the same backbone as the pretrained COCO model, and only train the
-model’s head. YOLOv5s6 backbone consists of 12 layers, who will be fixed by the ‘freeze’ 
+model’s head. YOLOv5s6 backbone consists of 10 layers, who will be fixed by the ‘freeze’ 
 argument.
 
-
-
-
-
-Download files from 
-
+train scrips:
 ```
-wget http://trax-geometry.s3.amazonaws.com/cvpr_challenge/SKU110K_fixed.tar.gz
+python train.py --batch 32 --epochs 100 --data 'yolov5/data/retail_data.yaml'
+-- weights 'yolov5s.pt' --cache --freeze 10  --project retail_prediction --name 'feature_extraction'
 ```
 
+- batch — batch size (-1 for auto batch size). Use the largest batch size that your hardware allows for.
+- epochs — number of epochs.
+- data — path to the data-configurations file.
+- weights — path to initial weights. COCO model will be downloaded automatically.
+- cache — cache images for faster training.
+- img — image size in pixels (default — 640).
+- freeze — number of layers to freeze
+- project— name of the project
+- name — name of the run
 
+If ‘project’ and ‘name’ arguments are supplied, the results are automatically saved there.
+Else, they are saved to ‘runs/train’ directory. 
+
+## Docker container
 ```
 docker build -t preparation_fa .
 docker build -t preparation -f preparation/Dockerfile .
@@ -87,7 +103,6 @@ docker build -t preparation -f preparation/Dockerfile .
 docker run --rm --net host -it\
     -v $(pwd):/home/src/app \
     -v /home/fabioalvarez/retail_prediction/data:/home/src/data \
-    -v /home/fabioalvarez/retail_prediction/.env:/home/src \
     --workdir /home/src \
     preparation \
     bash
@@ -96,7 +111,7 @@ docker run --rm --net host -it\
 ```bash
 $ docker run --rm --net host --gpus all -it \
     -v /home/fabioalvarez/retail_prediction/training:/home/src/app \
-    -v /home/fabioalvarez/retail_prediction/data:/home/src/data \
+    -v /home/eudesz/final_project/data:/home/src/data \
     --workdir /home/src \
     preparation_fa \
     bash
