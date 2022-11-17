@@ -37,7 +37,6 @@ def create_labels_path():
             os.makedirs(key_labels_dir)
 
 
-
 def box_normalization(csv_paths, subset, filename):
 
     df_annotations = pd.read_csv(f'{csv_paths}annotations_{subset}.csv', names=["image_name", "x1", "y1", "x2", "y2","class", "image_width", "image_height"])
