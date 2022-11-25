@@ -35,7 +35,7 @@ RUN pip3 install torch==1.10.0+cu111 torchvision==0.11.0+cu111 torchaudio==0.10.
 WORKDIR /home/src
 
 # Clone yolov5
-# RUN git clone https://github.com/ultralytics/yolov5 /home/src/yolov5
+RUN git clone https://github.com/ultralytics/yolov5 /home/src/yolov5
 
 ## -------------------------------------------------------------------------------------------------------
 
