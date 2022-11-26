@@ -19,21 +19,20 @@ load_dotenv()
 
 
 # Load env variables
-database = os.getenv('DATABASE')
+source = os.getenv('DATABASE')
 project = os.getenv('PROJECT')
-weights = os.getenv('WEIGTHS')
+# weights = os.getenv('WEIGTHS')
 save_txt = os.getenv('SAVE_TXT')
-source =os.getenv('SAVE_TXT')
 
 
 # Load preset variables preset from the ArgParse function
 args = parse_opt()
 
 # Change values
-args.save_conf = True
-args.save_txt = True
-args.project = project
-# args.weights = weights
+args.save_txt = save_txt         # save bounding boxes
+args.project = project           # dir to save results 
+args.source = source             # dir where images are (db)
+# args.weights = weights         # dir of weigths to use
 
 
 def predict(image_name):
@@ -55,13 +54,10 @@ def predict(image_name):
     class_name = None
     pred_probability = None
 
-    # Update image path and add path to args
-    image_path = os.path.join(source, image_name)
-
     # Update name and source arguments
-    args.name = image_name
-    args.source = image_path
-
+    args.name = image_name.split(".")[0]                   # final location to save results
+    args.source = os.path.join(source, image_name)         # Image to predict
+    
     # Predict from image
     run = main_detect(args)
 
@@ -106,5 +102,5 @@ def classify_process():
 if __name__ == '__main__':
     # Now launch process
     print("Launching ML service...")
-    predict("zidane.jpg")
+    predict("helloworld.jpg")
     #classify_process()

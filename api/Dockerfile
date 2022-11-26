@@ -1,13 +1,25 @@
 FROM python:3.9 as base
 
-WORKDIR  /src
+# Set workdir
+WORKDIR /home/src
 
+# Update pip
 RUN pip3 install --upgrade pip
 
-COPY ./requirements.txt /src/requirements.txt
+# Copy requirements
+COPY ./requirements.txt .
 
-RUN pip install --no-cache-dir --upgrade -r /src/requirements.txt
+# Install requirements
+RUN pip install --no-cache-dir --upgrade -r /home/src/requirements.txt
 
-COPY ./app /src/app
+# Set python path
+ENV PYTHONPATH=$PYTHONPATH:/home/src/
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
+# Copy info inside 
+COPY . home/src/
+
+# FROM base as test
+# RUN ["pytest", "-v", "/src/tests"]
+
+# Start the api service
+# CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "5000"]
