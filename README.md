@@ -93,28 +93,53 @@ python train.py --batch 32 --epochs 100 --data 'yolov5/data/retail_data.yaml'
 If ‘project’ and ‘name’ arguments are supplied, the results are automatically saved there.
 Else, they are saved to ‘runs/train’ directory. 
 
-## Docker container
+## Docker
 ```
-docker build -t preparation_fa .
-docker build -t preparation -f preparation/Dockerfile .
+docker build -t yolov5_fa .
 ```
+### Docker training
 
 ```
-docker run --rm --net host -it\
-    -v $(pwd):/home/src/app \
-    -v /home/fabioalvarez/retail_prediction/data:/home/src/data \
-    --workdir /home/src \
-    preparation \
-    bash
-```
-
-```bash
-$ docker run --rm --net host --gpus all -it \
+docker run --rm --net host --gpus all -it \
     -v /home/fabioalvarez/retail_prediction/training:/home/src/app \
-    -v /home/eudesz/final_project/data:/home/src/data \
+    -v /home/eudesz/final_project/data:/home/src/dataset \
+    -v /home/fabioalvarez/retail_prediction/data:/home/src/data \
     --workdir /home/src \
     preparation_fa \
     bash
+```
+
+### Docker model
+
+```
+docker build -t model_fa .
+```
+
+```
+docker run --rm --net host --gpus all -it \
+    -v /home/fabioalvarez/retail_prediction/yolov5:/home/src/app \
+    -v /home/fabioalvarez/retail_prediction/data:/home/src/data \
+    -v /home/fabioalvarez/retail_prediction/model:/home/src/model \
+    --workdir /home/src \
+    model_fa \
+    bash
+```
+
+
+### Tmux
+```
+tmux new -t fabio_train
+```
+
+### Start trianing
+
+Run this inside yolov5 folder
+
+```
+python3 train.py --img 416 --batch 4 --epochs 3 \
+    --data /home/src/app/yolo_config/retail_config.yaml \
+    --weights yolov5s.pt --cache --project /home/src/data \
+    --name retail
 ```
 
 
