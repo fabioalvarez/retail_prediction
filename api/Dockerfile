@@ -7,7 +7,7 @@ WORKDIR /home/src
 RUN pip3 install --upgrade pip
 
 # Copy requirements
-COPY ./requirements.txt .
+COPY requirements.txt .
 
 # Install requirements
 RUN pip install --no-cache-dir --upgrade -r /home/src/requirements.txt
@@ -16,7 +16,7 @@ RUN pip install --no-cache-dir --upgrade -r /home/src/requirements.txt
 ENV PYTHONPATH=$PYTHONPATH:/home/src/
 
 # Copy info inside 
-COPY . home/src/
+COPY . home/src/api
 
 # FROM base as test
 # RUN ["pytest", "-v", "/src/tests"]

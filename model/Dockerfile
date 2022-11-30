@@ -34,6 +34,9 @@ RUN pip3 install torch==1.10.0+cu111 torchvision==0.11.0+cu111 torchaudio==0.10.
 # Create working directory
 WORKDIR /home/src
 
+# Copy info inside 
+COPY . home/src/model
+
 # Avoid problems with yolov5 clone
 RUN git config --global --add safe.directory /home/src/app
 
