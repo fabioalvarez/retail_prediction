@@ -126,6 +126,18 @@ docker run --rm --net host --gpus all -it \
 ```
 
 
+```
+docker run --rm --net host --gpus all -it \
+    --workdir /home/src \
+    api_fa \
+    bash
+```
+
+
+```bash
+$ docker-compose up --build -d
+```
+
 ### Tmux
 ```
 tmux new -t fabio_train
@@ -141,6 +153,14 @@ python3 train.py --img 416 --batch 4 --epochs 3 \
     --weights yolov5s.pt --cache --project /home/src/data \
     --name retail
 ```
+
+# Check problems
+```
+DOCKER_BUILDKIT=0  docker build .
+```
+
+
+
 
 
 # api
