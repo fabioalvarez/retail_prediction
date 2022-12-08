@@ -65,4 +65,3 @@ def model_predict(image_name):
         time.sleep(settings.API_SLEEP)
 
     return prediction, score
-

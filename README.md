@@ -117,10 +117,10 @@ docker build -t model_fa .
 
 ```
 docker run --rm --net host --gpus all -it \
-    -v /home/fabioalvarez/retail_prediction/yolov5:/home/src/app \
-    -v /home/fabioalvarez/retail_prediction/data:/home/src/data \
-    -v /home/fabioalvarez/retail_prediction/model:/home/src/model \
-    --workdir /home/src \
+    -v /home/fabioalvarez/retail_prediction/yolov5:/home/app/src/service \
+    -v /home/fabioalvarez/retail_prediction/data:/home/app/src/data \
+    -v /home/fabioalvarez/retail_prediction/model:/home/app/src/model \
+    --workdir /home/app/src \
     model_fa \
     bash
 ```
