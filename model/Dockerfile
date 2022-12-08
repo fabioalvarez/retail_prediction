@@ -16,12 +16,13 @@ RUN apt-get -y update
 RUN apt-get -y install git
 
 # Add a non-root user
-# RUN useradd -ms /bin/bash app
-# USER app
+RUN useradd -ms /bin/bash app
+USER app
 
 # Setup some paths
-ENV PYTHONPATH=/home/src/.local/lib/python3.8/site-packages:/home/src
-ENV PATH=$PATH:/home/src/.local/bin
+# Setup some paths
+ENV PYTHONPATH=/home/app/.local/lib/python3.8/site-packages:/home/src
+ENV PATH=$PATH:/home/app/.local/bin
 
 # Install the python packages for this new user
 ADD requirements.txt .
@@ -30,47 +31,22 @@ RUN pip3 install -r requirements.txt
 # PyTorch GPU 1.10
 RUN pip3 install torch==1.10.0+cu111 torchvision==0.11.0+cu111 torchaudio==0.10.0 -f https://download.pytorch.org/whl/torch_stable.html
 
-## ------
+# Copy info inside 
+ADD . /home/src
+
 # Create working directory
 WORKDIR /home/src
 
-# Copy info inside 
-COPY . home/src/model
-
 # Avoid problems with yolov5 clone
-RUN git config --global --add safe.directory /home/src/app
+RUN git config --global --add safe.directory /home/src/yolov5
 
 # Clone yolov5
-# RUN git clone https://github.com/ultralytics/yolov5 /home/src/yolov5
+# RUN git clone https://github.com/ultralytics/yolov5 /src/yolov5
+
+# FROM base as test
+# RUN ["pytest", "-v", "/src/tests"]
+
+FROM base as build
+CMD ["python3", "/home/src/ml_service.py"]
 
 ## -------------------------------------------------------------------------------------------------------
-
-# # Start FROM NVIDIA PyTorch image https://ngc.nvidia.com/catalog/containers/nvidia:pytorch
-# FROM nvcr.io/nvidia/pytorch:22.04-py3
-# RUN rm -rf /opt/pytorch  # remove 1.2GB dir
-
-# # Downloads to user config dir
-# ADD https://ultralytics.com/assets/Arial.ttf https://ultralytics.com/assets/Arial.Unicode.ttf /root/.config/Ultralytics/
-
-# # Install linux packages
-# RUN apt update && apt install --no-install-recommends -y zip htop screen libgl1-mesa-glx
-
-# # Install pip packages
-# COPY requirements.txt .
-# RUN python -m pip install --upgrade pip wheel
-# RUN pip uninstall -y Pillow torchtext  # torch torchvision
-# RUN pip install --no-cache -r requirements.txt ultralytics albumentations comet gsutil notebook Pillow>=9.1.0 \
-#     'opencv-python<4.6.0.66' \
-#     --extra-index-url https://download.pytorch.org/whl/cu113
-
-# # Create working directory
-# RUN mkdir -p /home/src/app
-# WORKDIR /home/src/app
-
-# # Copy contents
-# # COPY . /usr/src/app  (issues as not a .git directory)
-# # git clone https://github.com/ultralytics/yolov5 /home/src/yolov5
-
-# # Set environment variables
-# ENV OMP_NUM_THREADS=8
-# Update

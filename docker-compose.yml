@@ -10,18 +10,27 @@ services:
       - "80:5000"
     environment:
       - API_SERVICE__MODE="prod"
+    depends_on:
+      - redis
+      - model
     volumes:
       - ./data:/home/src/data
+      - ./api:/home/src/api
 
-  # redis:
-  #   image: redis:6.2.6
-
-  # model:
-  #   image: ml_service
-  #   build:
-  #     context: ./model
-  #     target: build
-  #   depends_on:
-  #     - redis
-  #   volumes:
-  #     - ./data:/home/src/data
+  redis:
+    image: redis:6.2.6
+    container_name: redis
+    
+    
+  model:
+    image: ml_service
+    container_name: model
+    build:
+      context: ./model
+      target: build
+    depends_on:
+      - redis
+    volumes:
+      - ./data:/home/src/data
+      - ./yolov5:/home/src/yolov5
+      - ./api:/home/src/api

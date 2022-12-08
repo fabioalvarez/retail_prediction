@@ -1,4 +1,5 @@
 import hashlib
+import copy
 import os
 
 
@@ -24,7 +25,7 @@ def allowed_file(filename):
     return state
 
 
-def get_file_hash(file):
+def get_file_hash(file, file_name):
     """
     Returns a new filename based on the file content using MD5 hashing.
     It uses hashlib.md5() function from Python standard library to get
@@ -43,8 +44,10 @@ def get_file_hash(file):
     # Current implementation will return the original file name.
     # TODO
 
-    contents = file.stream.read()
-    filename_content = hashlib.md5(contents)
-    name_file = filename_content.hexdigest() + "." + file.filename.split('.')[1]
-    file.stream.seek(0)
-    return os.path.basename(name_file)
+    #contents = file.stream.read()
+    #filename_content = hashlib.md5(contents)
+    file_copy = copy.deepcopy(file)
+    content = file_copy.read()
+    filename_content = hashlib.md5(content)
+    name_file = filename_content.hexdigest() + "." + file_name.split('.')[1]
+    return str(name_file)
