@@ -38,7 +38,7 @@ ADD . /home/src
 WORKDIR /home/src
 
 # Avoid problems with yolov5 clone
-RUN git config --global --add safe.directory /home/src/yolov5
+# RUN git config --global --add safe.directory /home/src/yolov5
 
 # Clone yolov5
 # RUN git clone https://github.com/ultralytics/yolov5 /src/yolov5

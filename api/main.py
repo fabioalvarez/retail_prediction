@@ -1,15 +1,17 @@
 '''
 Minimal example using fastAPI.
 '''
-from typing import Optional
-
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile,File, BackgroundTasks,requests,templating
+from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from typing import Optional
 import uvicorn
 
 # Extra modules
 import shutil
 import os
+from os import getcwd
 
 # Custom modules
 from utils import allowed_file
@@ -21,12 +23,16 @@ import settings
 
 app = FastAPI()
 
+app = FastAPI(title="Service Object Detection")
+app.mount("/front",StaticFiles(directory="../api/front"), name="static")
 
-@app.get("/")
-def index():
-    return {"Hello": "API"}
+@app.get("/", response_class=HTMLResponse)
+def root():
+    html_address = "../api/front/index.html"
 
-@app.post("/")
+    return FileResponse(html_address, status_code=200)
+
+@app.post("/", status_code=201)
 async def image(image: UploadFile = File(...)):
 
     # Get image name
@@ -74,3 +80,44 @@ async def image(image: UploadFile = File(...)):
     file_name = image.filename
     hashed_name = get_file_hash(image.file, file_name)
     return {"hash_name": hashed_name}
+
+
+    ###################
+
+
+# from fastapi import FastAPI, UploadFile,File, BackgroundTasks,requests,templating
+# from fastapi.responses import HTMLResponse, FileResponse
+# from fastapi.staticfiles import StaticFiles
+# from os import getcwd
+
+# import uuid
+# db = []
+# PATH_FILE = "../api/feedback/" #folder file predict
+
+
+# app = FastAPI(title="Service Object Detection")
+# app.mount("/templates",StaticFiles(directory="../api/templates"), name="static")
+
+
+# @app.get("/", response_class=HTMLResponse)
+# def root():
+
+#     html_address = "../api/templates/index.html"
+#     return FileResponse(html_address, status_code=200)
+
+# """
+# Function used in the frontend so it can upload and show an image.
+
+# """
+
+# @app.post("/")
+# async def uploadfile(file:UploadFile= File(...)):
+#     #file.filename = f"{uuid.uuid4()}.jpg"
+#     file_name = file.filename
+#     contents = await file.read()
+#     db.append(contents)
+#     path = PATH_FILE + file_name #folder file and filename(hash)
+#    # html_result = "../api/templates/result.html"
+
+#     return FileResponse(path=path)
+
