@@ -43,7 +43,7 @@ RUN git clone https://github.com/ultralytics/yolov5 /home/src/yolov5
 ADD __init__.py /home/src/yolov5
 
 # Copy info inside 
-ADD . /home/src
+ADD . /home/src/model
 
 FROM base as build
-CMD ["python3", "/home/src/ml_service.py"]
+CMD ["python3", "/home/src/model/ml_service.py"]

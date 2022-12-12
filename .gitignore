@@ -11,3 +11,5 @@ api/__pycache__/utils.cpython-39.pyc
 .gitignore
 /home/fabioalvarez/retail_prediction/api/bootstrap-4.3.1-dist
 /workspaces/fabioalvarez/retail_prediction/api/front
+.devcontainer/devcontainer.json
+.devcontainer/docker-compose.yml

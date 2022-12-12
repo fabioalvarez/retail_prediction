@@ -5,4 +5,4 @@ redis==4.1.4
 werkzeug==2.0.3
 aiofiles==0.8.0
 python-multipart==0.0.5
-jinja2==3.0.3
+Jinja2==3.0.3

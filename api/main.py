@@ -97,3 +97,6 @@ async def image(request:Request, response:Response, image: UploadFile = File(...
         #return FileResponse(path= folder_temp)
         
         return templates.TemplateResponse("index.html",{"request":request,"imgpredict":pathpredict,"imgori":pathori})
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=5000)
