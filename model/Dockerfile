@@ -20,7 +20,6 @@ RUN useradd -ms /bin/bash app
 USER app
 
 # Setup some paths
-# Setup some paths
 ENV PYTHONPATH=/home/app/.local/lib/python3.8/site-packages:/home/src
 ENV PATH=$PATH:/home/app/.local/bin
 
@@ -48,5 +47,3 @@ WORKDIR /home/src
 
 FROM base as build
 CMD ["python3", "/home/src/ml_service.py"]
-
-## -------------------------------------------------------------------------------------------------------

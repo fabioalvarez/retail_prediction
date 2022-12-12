@@ -3,7 +3,7 @@ import time
 from uuid import uuid4 
 
 import redis
-import settings
+from redisqueue import settings
 
 # TODO
 # Connect to Redis and assign to variable `db``
