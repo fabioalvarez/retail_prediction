@@ -34,4 +34,3 @@ services:
       - ./model:/home/src/model
       - ./data:/home/src/data
       - ./api:/home/src/api
-      

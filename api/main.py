@@ -79,12 +79,10 @@ async def image(request:Request, response:Response, image: UploadFile = File(...
             shutil.copyfileobj(image.file, buffer)
 
         # 3. Send the file to be processed by the `model` service            
-        prediction, score = model_predict(hashed_name)
+        status = model_predict(hashed_name)
 
         # 4. Update `context` dict with the corresponding values
-       
-        folder = hashed_name.split(".")[0]
-        path = os.path.join(PATH_FILE, folder ,hashed_name)
+        path = os.path.join(PATH_FILE ,hashed_name)
         imgpath = os.path.join(PATH_ORI,hashed_name)  
 
         shutil.copy2(path,PATH_DESTINY + hashed_name)
@@ -92,11 +90,8 @@ async def image(request:Request, response:Response, image: UploadFile = File(...
 
         pathpredict = os.path.join(PATH_DESTINY , hashed_name)
         pathori = os.path.join(PATH_DESTORI , hashed_name)
-
-        folder_temp = PATH_DESTINY + hashed_name
-        #return FileResponse(path= folder_temp)
         
         return templates.TemplateResponse("index.html",{"request":request,"imgpredict":pathpredict,"imgori":pathori})
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=5000)
+    uvicorn.run(app, host="127.0.0.1", port=8000)

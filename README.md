@@ -26,7 +26,7 @@ To start this process, you need to build the preparation image. You need to run 
 inside trainig folder.
 
 ```
-docker build -t preparation_fa .
+docker build -t api_test .
 ```
 
 After that you need to run the container. That's all you need to start the training process (XXXXXXX)

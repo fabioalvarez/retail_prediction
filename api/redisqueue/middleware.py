@@ -17,20 +17,16 @@ def model_predict(image_name):
     """
     Receives an image name and queues the job into Redis.
     Will loop until getting the answer from our ML service.
-
     Parameters
     ----------
     image_name : str
         Name for the image uploaded by the user.
-
     Returns
     -------
     prediction, score : tuple(str, float)
         Model predicted class as a string and the corresponding confidence
         score as a number.
     """
-    prediction = None
-    score = None
 
     # Assign an unique ID for this job and add it to the queue.
     # We need to assing this ID because we must be able to keep track
@@ -52,8 +48,7 @@ def model_predict(image_name):
         
         if output:
             output = json.loads(output.decode("utf-8"))
-            prediction = output["prediction"]
-            score = output["score"]
+            status = output["status"]
 
             # After we extract the prediction, score we have to delete the id
             db.delete(job_id)
@@ -64,4 +59,4 @@ def model_predict(image_name):
         # Sleep some time waiting for model results
         time.sleep(settings.API_SLEEP)
 
-    return prediction, score
+    return status
