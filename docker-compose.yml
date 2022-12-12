@@ -32,5 +32,4 @@ services:
       - redis
     volumes:
       - ./data:/home/src/data
-      - ./yolov5:/home/src/yolov5
       - ./api:/home/src/api

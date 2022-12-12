@@ -8,8 +8,6 @@ COPY requirements.txt .
 
 # Install requirements
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
-RUN pip install aiofiles
-RUN pip install python-multipart
 
 # Set python path
 ENV PYTHONPATH=$PYTHONPATH:/home/src/
@@ -19,9 +17,6 @@ WORKDIR /home/src
 
 # Copy info inside 
 ADD . /home/src/api/
-
-# FROM base as test
-# RUN ["pytest", "-v", "/src/tests"]
 
 # Start the api service
 FROM base as build
