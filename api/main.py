@@ -1,12 +1,16 @@
 '''
 Minimal example using fastAPI.
 '''
-from fastapi import FastAPI, UploadFile,File, BackgroundTasks,requests,templating
+from fastapi import FastAPI, UploadFile,File, BackgroundTasks,Request,templating,Form, Cookie, Depends,Response
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import Optional
 import uvicorn
+
+# TEST MODULE *--*--*-*-*
+from fastapi.templating import Jinja2Templates
+from starlette.responses import RedirectResponse, Response
 
 # Extra modules
 import shutil
@@ -14,26 +18,39 @@ import os
 from os import getcwd
 
 # Custom modules
-from utils import allowed_file
-from utils import get_file_hash
-from middleware import model_predict
-import settings
+from redisqueue.utils import allowed_file
+from redisqueue.utils import get_file_hash
+from redisqueue.middleware import model_predict
+from redisqueue import settings
+import shutil
 
-# Instantiate API
 
+#Instantiate API
 app = FastAPI()
 
+#Static file serv
 app = FastAPI(title="Service Object Detection")
 app.mount("/front",StaticFiles(directory="../api/front"), name="static")
 
+#Jinja2 Template directory
+templates = Jinja2Templates(directory="front") #folder templates
+
+# Paths
+PATH_FILE = "../data/predictions/"
+PATH_ORI = "../data/uploads/"
+PATH_DESTORI = "front/assets/temp/"
+PATH_DESTINY = "front/assets/temp/imgori/"
+
+# Constrcut endpoints
 @app.get("/", response_class=HTMLResponse)
 def root():
     html_address = "../api/front/index.html"
 
     return FileResponse(html_address, status_code=200)
 
-@app.post("/", status_code=201)
-async def image(image: UploadFile = File(...)):
+
+@app.post("/", status_code=201, response_class=HTMLResponse)
+async def image(request:Request, response:Response, image: UploadFile = File(...)):
 
     # Get image name
     file_name = image.filename
@@ -62,62 +79,19 @@ async def image(image: UploadFile = File(...)):
             shutil.copyfileobj(image.file, buffer)
 
         # 3. Send the file to be processed by the `model` service            
-        prediction, score = model_predict(hashed_name)
+        status = model_predict(hashed_name)
 
         # 4. Update `context` dict with the corresponding values
-        context = {
-            "prediction": prediction,
-            "score": str(score),
-            "filename": hashed_name}
-    
-    return context
+        path = os.path.join(PATH_FILE ,hashed_name)
+        imgpath = os.path.join(PATH_ORI,hashed_name)  
 
+        shutil.copy2(path,PATH_DESTINY + hashed_name)
+        shutil.copy2(imgpath,PATH_DESTORI + hashed_name)
 
-@app.post("/hash")
-async def image(image: UploadFile = File(...)):
+        pathpredict = os.path.join(PATH_DESTINY , hashed_name)
+        pathori = os.path.join(PATH_DESTORI , hashed_name)
+        
+        return templates.TemplateResponse("index.html",{"request":request,"imgpredict":pathpredict,"imgori":pathori})
 
-    # Get image name
-    file_name = image.filename
-    hashed_name = get_file_hash(image.file, file_name)
-    return {"hash_name": hashed_name}
-
-
-    ###################
-
-
-# from fastapi import FastAPI, UploadFile,File, BackgroundTasks,requests,templating
-# from fastapi.responses import HTMLResponse, FileResponse
-# from fastapi.staticfiles import StaticFiles
-# from os import getcwd
-
-# import uuid
-# db = []
-# PATH_FILE = "../api/feedback/" #folder file predict
-
-
-# app = FastAPI(title="Service Object Detection")
-# app.mount("/templates",StaticFiles(directory="../api/templates"), name="static")
-
-
-# @app.get("/", response_class=HTMLResponse)
-# def root():
-
-#     html_address = "../api/templates/index.html"
-#     return FileResponse(html_address, status_code=200)
-
-# """
-# Function used in the frontend so it can upload and show an image.
-
-# """
-
-# @app.post("/")
-# async def uploadfile(file:UploadFile= File(...)):
-#     #file.filename = f"{uuid.uuid4()}.jpg"
-#     file_name = file.filename
-#     contents = await file.read()
-#     db.append(contents)
-#     path = PATH_FILE + file_name #folder file and filename(hash)
-#    # html_result = "../api/templates/result.html"
-
-#     return FileResponse(path=path)
-
+if __name__ == "__main__":
+    uvicorn.run(app, host="127.0.0.1", port=8000)

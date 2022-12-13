@@ -31,6 +31,6 @@ services:
     depends_on:
       - redis
     volumes:
+      - ./model:/home/src/model
       - ./data:/home/src/data
-      - ./yolov5:/home/src/yolov5
       - ./api:/home/src/api

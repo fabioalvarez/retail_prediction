@@ -18,9 +18,7 @@ WORKDIR /home/src
 # Copy info inside 
 ADD . /home/src/api/
 
-# FROM base as test
-# RUN ["pytest", "-v", "/src/tests"]
-
 # Start the api service
 FROM base as build
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]
+CMD ["python3", "/home/src/api/main.py"]
+# CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]
