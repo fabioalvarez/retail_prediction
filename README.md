@@ -7,26 +7,22 @@ This project is divided in different topics.
 
 - Training.
 - Service deployment.
-- Tests.
 
+Let's start this journey
 
-# Training
+# First Step - Training
 The goal of this topic is to train the yolov5 model and get the weigths to predict empty
 spaces in shelves.
 
-To get this result we need:
-- Prepare dataset and labels: 
-- Set YoloV5 data configurations files.
-- Train
-
+How to start training your object detection model?
+Check it out.
 
 ## Preparation
-
 To start this process, you need to build the preparation image. You need to run the next line
 inside trainig folder.
 
 ```
-docker build -t api_test .
+docker build -t training .
 ```
 
 After that you need to run the container. That's all you need to start the training process (XXXXXXX)
@@ -37,16 +33,17 @@ docker run --rm --net host --gpus all -it \
     -v /home/eudesz/final_project/data:/home/src/dataset \
     -v /home/fabioalvarez/retail_prediction/data:/home/src/data \
     --workdir /home/src \
-    preparation_fa \
+    training \
     bash
 ```
 
-The explanation of preparation process is as follows.
+The explanation of training process is as follows (this is done automatically when you run the container).
 
 ### Download dataset
 Initially we are not going to download the dataset due to EC2 space limit.
 So we will map the dataset from the Eudes EC2 account.
 
+If you want to download it, you can use:
 ```
 wget http://trax-geometry.s3.amazonaws.com/cvpr_challenge/SKU110K_fixed.tar.gz
 ```
@@ -184,69 +181,26 @@ python3 train.py --img 416 --batch 4 --epochs 3 \
 ```
 
 
+# Second Step - Running Microservices
+This app is based in the next microservices architecture:
+
+API: This microservice allows us to communicate with the front end of the web page and be able to receive the images, save them and also return and render the response (image of the shelves with). The Fast Api framework was used for this.
+
+Redis: This microservice is in charge of receiving the requirement from the client and queueing it, in order to send the requirements to the model as it delivers the result.
+
+Model: This microservice receives the jobs from Redis and passes them to a yolov5 model which is the one that will finally make the prediction. This result passes again through Redis and is rendered by means of the Fast Api microservice.
+
+Docker: For our system to work, a container is created for each microservice using Dockerfiles and Docker-compose. This also helps to secure our system when it is ready to go to production.
 
 
 
-
-### Docker model
-
-```
-docker build -t model_fa .
-```
-
-```
-docker run --rm --net host --gpus all -it \
-    -v /home/fabioalvarez/retail_prediction/yolov5:/home/app/src/service \
-    -v /home/fabioalvarez/retail_prediction/data:/home/app/src/data \
-    -v /home/fabioalvarez/retail_prediction/model:/home/app/src/model \
-    --workdir /home/app/src \
-    model_fa \
-    bash
-```
+Locust: Finally, locust is used to test API calls, to know our responsiveness.
 
 
-```
-docker run --rm --net host --gpus all -it \
-    --workdir /home/src \
-    api_fa \
-    bash
-```
+### Up containers
 
-
-```bash
-$ docker-compose up --build -d
-```
-
-### Tmux
-```
-tmux new -t fabio_train
-```
-
-
-
-# Check problems
-```
-DOCKER_BUILDKIT=0  docker build .
-```
-
-
-
-
-
-# api
-```
-.
-├── app
-│   ├── __init__.py
-│   └── main.py
-├── Dockerfile
-└── requirements.txt
-
-```
-
-
-# Docker build image
-
-```
-docker build -t api_test .
-```
+-  If you are using visual studio code, you can go to the most inferior side of the IDE and click the green buttom.
+-  After that select "open folder in container".
+-  Select the folder where the project is.
+-  Select the option "from docker compose".
+-  After that, attach to the api container
