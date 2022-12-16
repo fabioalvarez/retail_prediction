@@ -1,0 +1,4 @@
+.devcotainer
+training/preparation/.env
+.devcontainer/devcontainer.json
+.devcontainer/docker-compose.yml
